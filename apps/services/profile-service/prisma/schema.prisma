@@ -1,0 +1,19 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ProfileServiceDomain {
+  id          String   @id @default(uuid())
+  name        String   @db.VarChar(128)
+  description String?  @db.VarChar(1024)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("profile_resources")
+}
