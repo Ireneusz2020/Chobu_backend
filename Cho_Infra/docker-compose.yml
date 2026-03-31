@@ -1,0 +1,30 @@
+version: '3.9'
+services:
+  frontend:
+    build: ../Cho_Front
+    ports: ["5173:80"]
+    depends_on: [backend]
+  backend:
+    build: ../Cho_Back
+    environment:
+      DATABASE_URL: postgresql+psycopg://chobu:chobu@postgres:5432/chobu
+      REDIS_URL: redis://redis:6379/0
+      JWT_SECRET: super-secret
+    ports: ["8000:8000"]
+    depends_on: [postgres, redis]
+  notification:
+    build: ../Cho_Info
+    environment:
+      DATABASE_URL: postgresql+psycopg://chobu:chobu@postgres:5432/chobu
+      REDIS_URL: redis://redis:6379/0
+    depends_on: [postgres, redis]
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: chobu
+      POSTGRES_PASSWORD: chobu
+      POSTGRES_DB: chobu
+    ports: ["5432:5432"]
+  redis:
+    image: redis:7
+    ports: ["6379:6379"]

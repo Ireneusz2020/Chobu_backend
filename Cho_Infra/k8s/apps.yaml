@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: backend, namespace: chobu }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: backend } }
+  template:
+    metadata: { labels: { app: backend } }
+    spec:
+      containers:
+        - name: backend
+          image: ireneusz2020/cho_back:latest
+          ports: [{ containerPort: 8000 }]
+          env:
+            - name: DATABASE_URL
+              valueFrom: { secretKeyRef: { name: chobu-secret, key: BACKEND_DATABASE_URL } }
+            - name: REDIS_URL
+              valueFrom: { configMapKeyRef: { name: chobu-config, key: BACKEND_REDIS_URL } }
+            - name: JWT_SECRET
+              valueFrom: { secretKeyRef: { name: chobu-secret, key: JWT_SECRET } }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: backend, namespace: chobu }
+spec:
+  selector: { app: backend }
+  ports: [{ port: 8000, targetPort: 8000 }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: notification, namespace: chobu }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: notification } }
+  template:
+    metadata: { labels: { app: notification } }
+    spec:
+      containers:
+        - name: notification
+          image: ireneusz2020/cho_info:latest
+          env:
+            - name: DATABASE_URL
+              valueFrom: { secretKeyRef: { name: chobu-secret, key: INFO_DATABASE_URL } }
+            - name: REDIS_URL
+              valueFrom: { configMapKeyRef: { name: chobu-config, key: INFO_REDIS_URL } }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: frontend, namespace: chobu }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: frontend } }
+  template:
+    metadata: { labels: { app: frontend } }
+    spec:
+      containers:
+        - name: frontend
+          image: ireneusz2020/cho_front:latest
+          ports: [{ containerPort: 80 }]
+---
+apiVersion: v1
+kind: Service
+metadata: { name: frontend, namespace: chobu }
+spec:
+  selector: { app: frontend }
+  ports: [{ port: 80, targetPort: 80 }]

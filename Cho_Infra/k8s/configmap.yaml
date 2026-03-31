@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: chobu-config
+  namespace: chobu
+data:
+  BACKEND_REDIS_URL: redis://redis:6379/0
+  INFO_REDIS_URL: redis://redis:6379/0
